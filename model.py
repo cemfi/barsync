@@ -42,7 +42,11 @@ class Net(pl.LightningModule):
         midpoint = self.fc_loc(combined_out)
         # print(midpoint)
 
-        loss = F.mse_loss(midpoint, x['map'][19][:, None], reduction='sum')
+        image_width = x['image'].shape[1]
+        map = x['map'][19][:, None]
+        map = map / image_width - 0.5
+
+        loss = F.mse_loss(midpoint, map, reduction='mean')
         accuracy = 1 / loss.mean().item()
 
         return loss, accuracy
@@ -76,7 +80,7 @@ class Net(pl.LightningModule):
         dataset = StretcherDataset(
             root=self.root + '/train'
         )
-        dist_sampler = torch.utils.data.distributed.DistributedSampler(dataset, shuffle=True) # torch.utils.data.RandomSampler(dataset)
+        dist_sampler = torch.utils.data.RandomSampler(dataset)  # torch.utils.data.distributed.DistributedSampler(dataset, shuffle=True)
         return DataLoader(
             dataset,
             sampler=dist_sampler,
@@ -88,7 +92,7 @@ class Net(pl.LightningModule):
         dataset = StretcherDataset(
             root=self.root + '/val'
         )
-        dist_sampler = torch.utils.data.distributed.DistributedSampler(dataset, shuffle=False) # torch.utils.data.RandomSampler(dataset)  #
+        dist_sampler =  torch.utils.data.RandomSampler(dataset) # torch.utils.data.distributed.DistributedSampler(dataset, shuffle=False)
         return DataLoader(
             dataset,
             sampler=dist_sampler,
