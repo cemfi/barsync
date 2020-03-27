@@ -17,11 +17,11 @@ class Net(pl.LightningModule):
         self.batch_size = batch_size
         self.root = root
 
-        self.spec_net = nn.Sequential(*list(resnet50(pretrained=False).children())[:-1], nn.ReLU(True))
-        self.image_net = nn.Sequential(*list(resnet50(pretrained=False).children())[:-1], nn.ReLU(True))
+        self.spec_net = nn.Sequential(*list(resnet18(pretrained=False).children())[:-1], nn.ReLU(True))
+        self.image_net = nn.Sequential(*list(resnet18(pretrained=False).children())[:-1], nn.ReLU(True))
 
         self.fc_loc = nn.Sequential(
-            nn.Linear(4096, 32),
+            nn.Linear(1024, 32),
             nn.ReLU(True),
             nn.Linear(32, 1)
         )
@@ -33,10 +33,10 @@ class Net(pl.LightningModule):
         image = torch.cat((i, i, i), 1)
 
         spec_out = self.spec_net(spec)
-        spec_out = spec_out.view(-1, 2048)
+        spec_out = spec_out.view(-1, 512)
 
         img_out = self.image_net(image.float())
-        img_out = img_out.view(-1, 2048)
+        img_out = img_out.view(-1, 512)
 
         combined_out = torch.cat((spec_out, img_out), 1)
         midpoint = self.fc_loc(combined_out)
@@ -54,7 +54,7 @@ class Net(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         losses, accuracy = self.forward(batch)
         tensorboard_logs = {
-            'train_loss': losses,
+            'train_loss': losses,aa
             'train_accuracy': accuracy
         }
         return {'loss': losses, 'log': tensorboard_logs}
@@ -80,7 +80,7 @@ class Net(pl.LightningModule):
         dataset = StretcherDataset(
             root=self.root + '/train'
         )
-        dist_sampler = torch.utils.data.RandomSampler(dataset)  # torch.utils.data.distributed.DistributedSampler(dataset, shuffle=True)
+        dist_sampler = torch.utils.data.distributed.DistributedSampler(dataset, shuffle=True)
         return DataLoader(
             dataset,
             sampler=dist_sampler,
@@ -92,7 +92,7 @@ class Net(pl.LightningModule):
         dataset = StretcherDataset(
             root=self.root + '/val'
         )
-        dist_sampler =  torch.utils.data.RandomSampler(dataset) # torch.utils.data.distributed.DistributedSampler(dataset, shuffle=False)
+        dist_sampler =  torch.utils.data.distributed.DistributedSampler(dataset, shuffle=False)
         return DataLoader(
             dataset,
             sampler=dist_sampler,
