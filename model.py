@@ -54,7 +54,7 @@ class Net(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         losses, accuracy = self.forward(batch)
         tensorboard_logs = {
-            'train_loss': losses,aa
+            'train_loss': losses,
             'train_accuracy': accuracy
         }
         return {'loss': losses, 'log': tensorboard_logs}
