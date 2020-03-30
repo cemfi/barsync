@@ -3,7 +3,7 @@ import statistics
 
 from pathlib import Path
 
-root = '/mnt/data/datasets/cross-mapping-4s'
+root = '/mnt/data/datasets/cross-mapping-4s/val'
 
 files = list(Path(root).rglob('*.pt'))
 
@@ -21,3 +21,5 @@ for idx, pt_filepath in enumerate(files):
 
     if idx % 10000 == 0 and idx != 0:
         print(statistics.mean(total_loss))
+
+print('Baseline MSE (final) = ', statistics.mean(total_loss))
