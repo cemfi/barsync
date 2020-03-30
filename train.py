@@ -10,5 +10,5 @@ if __name__ == '__main__':
     )
 
     # trainer = Trainer(gpus=-1, nb_sanity_val_steps=3)
-    trainer = Trainer(gpus=-1, nb_sanity_val_steps=1, min_nb_epochs=500, distributed_backend='ddp', early_stop_callback=False)
+    trainer = Trainer(gpus=-1, num_sanity_val_steps=1, val_check_interval=100, distributed_backend='ddp', show_progress_bar=False)
     trainer.fit(model)

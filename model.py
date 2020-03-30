@@ -22,6 +22,7 @@ class Net(pl.LightningModule):
 
         self.fc_loc = nn.Sequential(
             nn.Linear(1024, 32),
+            nn.Dropout(0.5),
             nn.ReLU(True),
             nn.Linear(32, 1)
         )
