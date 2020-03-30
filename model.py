@@ -44,7 +44,7 @@ class Net(pl.LightningModule):
         # print(midpoint)
 
         image_width = x['image'].shape[1]
-        map = x['map'][19][:, None]
+        map = x['map'][39][:, None]
         map = map / image_width - 0.5
 
         loss = F.mse_loss(midpoint, map, reduction='mean')
